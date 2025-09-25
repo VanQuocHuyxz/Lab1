@@ -65,6 +65,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+  int phase = 0;
+  int counter = 3;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -95,28 +97,52 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-	    HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, GPIO_PIN_RESET);
-	    HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-	 for (int counter = 9; counter >= 0; counter--){
-		 if (counter >= 5){
-			 HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
-			 HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, GPIO_PIN_SET);
-			 HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-		 }
-		 else if (counter >= 3){
-			 HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-			 HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, GPIO_PIN_RESET);
-			 HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_SET);
-		 }
-		 else if (counter >= 0){
-			 HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
-		     HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, GPIO_PIN_SET);
-			 HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
-		 }
-		 HAL_Delay(1000);
-	 }
-    /* USER CODE END WHILE */
+	  switch (phase)
+	  	      {
+	  	  case 0: // NS Red (5s đang đếm dần), EW Green (3s)
+	  	              // LED1 + LED3: Red
+	  	              HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, RESET);
+	  	              HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, SET);
+	  	              HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, SET);
+
+	  	              break;
+	  	  case 1: // NS Red, EW Yellow (2s)
+	  	              // LED1 + LED3: Red
+	  		  	  	  HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, RESET);
+	  	              HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, SET);
+	  	              HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, SET);
+
+	  	              break;
+
+	  	  case 2: // NS Green (3s), EW Red
+	  	              // LED1 + LED3: Green
+	  	              HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, SET);
+	  	              HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, SET);
+	  	              HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, RESET);
+
+	  	              break;
+
+	  	   case 3: // NS Yellow (2s), EW Red
+	  	              // LED1 + LED3: Yellow
+	  	              HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, SET);
+	  	              HAL_GPIO_WritePin(YELLOW_LED_GPIO_Port, YELLOW_LED_Pin, RESET);
+	  	              HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, SET);
+
+
+	  	              break;
+	  	      }
+
+	  	      HAL_Delay(1000);
+
+	  	      counter--;
+
+	  	      if (counter < 0)
+	  	      {
+	  	          phase = (phase + 1) % 4;
+
+	  	          if (phase == 0 || phase == 2) counter = 3;  // Green: 3s
+	  	          else if (phase == 1 || phase == 3) counter = 2; // Yellow: 2s
+	  	      }    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
